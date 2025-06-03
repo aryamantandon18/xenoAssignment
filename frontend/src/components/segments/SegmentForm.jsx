@@ -6,8 +6,8 @@ import RuleBuilder from './RuleBuilder';
 const SegmentForm = ({ initialData, onSubmit, onCancel }) => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: initialData || {
-      name: 'Premium Customers',
-      description: 'Customers spending more than $100 within 20 days',
+      name: '',
+      description: '',
       rules: [],
       logicOperator: 'AND'
     }
