@@ -5,9 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start:api": "node server.js",
-    "start:customer-consumer": "node consumers/customerConsumer.js",
-    "start:order-consumer": "node consumers/orderConsumer.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

@@ -1,58 +1,75 @@
-exports.evaluateCustomerAgainstSegment = (customer, segment) => {
-  const { rules, logicOperator = 'AND' } = segment;
-  
-  // Convert string values to numbers for numeric comparisons
-  const processedRules = rules.map(rule => {
-    const numericFields = ['totalSpent', 'visitCount', 'age', 'purchaseCount'];
-    const shouldConvertToNumber = numericFields.includes(rule.field) && 
-                                ['>', '<', '>=', '<=', '=', '!='].includes(rule.operator);
+const operatorMap = {
+  '>': '$gt',
+  '<': '$lt',
+  '>=': '$gte',
+  '<=': '$lte',
+  '=': '$eq',
+  '!=': '$ne',
+  'IN': '$in',
+  'NOT_IN': '$nin',
+  'CONTAINS': '$regex',
+  'NOT_CONTAINS': '$not',
+};
+
+// Build MongoDB query from segment rules
+exports.buildMongoQueryFromRules = (rules, logicOperator = 'AND') => {
+  const conditions = rules.map(rule => {
+    const { field, operator, value } = rule;
     
+    // Handle special cases
+    if (operator === 'CONTAINS' || operator === 'NOT_CONTAINS') {
+      return {
+        [field]: {
+          [operatorMap[operator]]: new RegExp(value, 'i'),
+        },
+      };
+    }
+    
+    // Handle date fields
+    if (field.includes('At') || field === 'createdAt' || field === 'updatedAt') {
+      const dateValue = new Date(value);
+      return {
+        [field]: {
+          [operatorMap[operator]]: dateValue,
+        },
+      };
+    }
+    
+    // Standard field handling
     return {
-      ...rule,
-      value: shouldConvertToNumber ? Number(rule.value) : rule.value
+      [field]: {
+        [operatorMap[operator]]: value,
+      },
     };
   });
 
-  const evaluateRule = (rule) => {
+  return logicOperator === 'AND' 
+    ? { $and: conditions } 
+    : { $or: conditions };
+};
+
+// Evaluate customer against segment rules
+exports.evaluateCustomerAgainstSegment = (customer, segment) => {
+  const { rules, logicOperator } = segment;
+  
+  return rules[logicOperator.toLowerCase()]((rule) => {
     const { field, operator, value } = rule;
     const customerValue = customer[field];
     
-    // Handle null/undefined customer values
-    if (customerValue === null || customerValue === undefined) {
-      return false;
-    }
-
     switch (operator) {
-      case '>': return Number(customerValue) > Number(value);
-      case '<': return Number(customerValue) < Number(value);
-      case '>=': return Number(customerValue) >= Number(value);
-      case '<=': return Number(customerValue) <= Number(value);
-      case '=': 
-      case '==': // Added support for double equals
-        return String(customerValue) === String(value);
-      case '!=': 
-        return String(customerValue) !== String(value);
-      case 'IN': 
-        return Array.isArray(value) && value.includes(customerValue);
-      case 'NOT_IN': 
-        return Array.isArray(value) && !value.includes(customerValue);
+      case '>': return customerValue > value;
+      case '<': return customerValue < value;
+      case '>=': return customerValue >= value;
+      case '<=': return customerValue <= value;
+      case '=': return customerValue === value;
+      case '!=': return customerValue !== value;
+      case 'IN': return value.includes(customerValue);
+      case 'NOT_IN': return !value.includes(customerValue);
       case 'CONTAINS': 
-        return String(customerValue).toLowerCase()
-          .includes(String(value).toLowerCase());
+        return String(customerValue).toLowerCase().includes(String(value).toLowerCase());
       case 'NOT_CONTAINS':
-        return !String(customerValue).toLowerCase()
-          .includes(String(value).toLowerCase());
-      default: 
-        throw new Error(`Unsupported operator: ${operator}`);
+        return !String(customerValue).toLowerCase().includes(String(value).toLowerCase());
+      default: return false;
     }
-  };
-
-  // Apply the logical operator
-  if (logicOperator.toUpperCase() === 'AND') {
-    return processedRules.every(evaluateRule);
-  } else if (logicOperator.toUpperCase() === 'OR') {
-    return processedRules.some(evaluateRule);
-  } else {
-    throw new Error(`Unsupported logical operator: ${logicOperator}`);
-  }
+  });
 };
