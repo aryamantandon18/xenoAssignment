@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 // Pages
 import Login from './pages/auth/Login';
-import SignUp from './pages/auth/SignUp';
+import SignUp from './pages/auth/Signup';
 import Dashboard from './pages/dashboard/Dashboard';
 import Customers from './pages/customers/Customers';
 import Segments from './pages/segments/Segments';
