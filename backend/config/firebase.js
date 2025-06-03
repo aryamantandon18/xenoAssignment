@@ -5,8 +5,9 @@ const path = require('path');
 const initializeFirebaseAdmin = () => {
   try {
     if (!admin.apps.length) {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_KEY);
       admin.initializeApp({
-        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_KEY))
+        credential: admin.credential.cert(serviceAccount)
       });
       console.log('Firebase Admin initialized successfully');
     }
