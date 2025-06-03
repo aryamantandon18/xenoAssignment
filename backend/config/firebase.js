@@ -6,7 +6,7 @@ const initializeFirebaseAdmin = () => {
   try {
     if (!admin.apps.length) {
       admin.initializeApp({
-        credential: admin.credential.cert(process.env.FIREBASE_SERVICE_KEY)
+        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_KEY))
       });
       console.log('Firebase Admin initialized successfully');
     }
