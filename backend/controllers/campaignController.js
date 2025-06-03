@@ -149,73 +149,10 @@ const deleteCampaign = asyncHandler(async (req, res) => {
   });
 });
 
-const getCampaignStats = asyncHandler(async (req, res) => {
-  const campaign = await Campaign.findOne({
-    _id: req.params.id,
-    createdBy: req.user.uid
-  });
-  
-  if (!campaign) {
-    res.status(404);
-    throw new Error('Campaign not found');
-  }
-
-  const logs = await CommunicationLog.find({
-    campaign: req.params.id
-  })
-    .populate('customer', 'name email')
-    .sort('-updatedAt')
-    .limit(50); // Return recent 50 logs
-
-  res.status(200).json({
-    stats: campaign.stats,
-    status: campaign.status,
-    recentLogs: logs,
-    lastUpdated: campaign.updatedAt
-  });
-});
-
-// @desc    Get campaign logs
-// @route   GET /api/campaigns/:id/logs
-// @access  Private
-const getCampaignLogs = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 20, status } = req.query;
-  
-  const campaign = await Campaign.findOne({
-    _id: req.params.id,
-    createdBy: req.user.uid
-  });
-  
-  if (!campaign) {
-    res.status(404);
-    throw new Error('Campaign not found');
-  }
-
-  const query = { campaign: req.params.id };
-  if (status) query.status = status;
-
-  const logs = await CommunicationLog.find(query)
-    .populate('customer', 'name email')
-    .sort('-updatedAt')
-    .skip((page - 1) * limit)
-    .limit(Number(limit));
-
-  const total = await CommunicationLog.countDocuments(query);
-
-  res.status(200).json({
-    data: logs,
-    page: Number(page),
-    pages: Math.ceil(total / limit),
-    total
-  });
-});
-
 module.exports = {
   createCampaign,
   getCampaigns,
   getCampaign,
   updateCampaign,
-  deleteCampaign,
-  getCampaignStats,
-  getCampaignLogs
+  deleteCampaign
 };
