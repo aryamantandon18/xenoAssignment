@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { motion } from 'framer-motion';
-
 // Pages
 import Login from './pages/auth/Login';
 import SignUp from './pages/auth/Signup';
@@ -11,7 +10,6 @@ import Customers from './pages/customers/Customers';
 import Segments from './pages/segments/Segments';
 import Campaigns from './pages/campaigns/Campaigns';
 import NotFound from './pages/404';
-
 // Components
 import Layout from './components/ui/Layout';
 import CustomToaster from './components/ui/CustomToaster';
@@ -144,8 +142,6 @@ const App = () => {
             />
 
           </Route>
-      
-
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
