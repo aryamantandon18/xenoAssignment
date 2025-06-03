@@ -1,0 +1,139 @@
+in kafka we have topics and in topics we have partitions
+- each consumer can consume multiple partitions but 1 partion can be alloted to only one consumer at a time
+
+- self balancing in kafka is on consumer groups level , means is we have 2 groups , group A has 2 consumers and Grp B has 1 consumer , we have one topics > 4 partions. 
+so, in grp A, 2 partions -> consumer 1 , 2 partions -> consumer 2 
+and , in grp B all the 4 partions will be alloted to single available consumer
+- and if we have 4 partions and 5 consumers in a grp , then each consumer will get a single partition & the 5th consumer will remain idle.
+
+- kafka can behave like a queue and a pub/sub architecture depending on the conditions
+QUEUE -> no. of partions = no. of consumers in a group (we have only 1 grp)
+PUB/SUB -> when we have multiple consumer groups
+
+zookeeper is a tool that kafka uses internally to manage all of the above explained 
+docker run -p 2181:2181 zookeeper
+
+docker run -p 9092:9092 \
+-e KAFKA_ZOOKEEPER_CONNECT=localhost:2181 \
+-e KAFKA_ADVERTISED_LISTENERs=PLAINTEXT://localhost:9092 \  (to tell kafka on which port he has to run)
+-e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+confluentinc/cp-kafka        (image name)
+
+
+
+1. What is Kafka?
+-----------------
+Kafka is a distributed event streaming platform used to handle real-time data pipelines, streaming applications, and asynchronous communication between services. It’s designed to ingest, store, and process large volumes of data in real-time.
+
+2. Key Use Cases:
+-----------------
+- Asynchronous communication between microservices
+- Event-driven architecture
+- Real-time analytics and monitoring
+- Log aggregation
+- Data pipeline and ETL systems
+- Buffering between producers and consumers
+
+3. Core Concepts:
+-----------------
+
+A. Topic
+- A category or feed name to which records are sent by producers.
+- Topics are split into partitions.
+- Consumers read data from topics.
+
+B. Partition
+- Each topic is split into one or more partitions for scalability.
+- Messages within a partition are ordered and immutable.
+- Each message in a partition has a unique offset.
+
+C. Offset
+- A unique sequential ID for each message in a partition.
+- Consumers use offsets to keep track of their position.
+- Kafka allows rewinding/replaying data by offset.
+
+D. Producer
+- A client that publishes records to one or more Kafka topics.
+- Can send data with or without a key (key can influence partition assignment).
+
+E. Consumer
+- A client that subscribes to topics and processes records.
+- Maintains the current offset to ensure records are not lost or reprocessed.
+
+F. Consumer Group
+- A group of consumers that cooperate to consume data from a topic.
+- Kafka guarantees that each partition is consumed by only one consumer in a group.
+- If the number of partitions > number of consumers, some consumers will read multiple partitions.
+
+G. Broker
+- A Kafka server that stores data and serves client requests (produce/consume).
+- Multiple brokers form a Kafka cluster.
+
+H. Cluster
+- A group of Kafka brokers working together.
+- Provides load balancing, fault tolerance, and scalability.
+
+I. Replication
+- Partitions are replicated across multiple brokers.
+- One replica is the leader; others are followers.
+- Ensures high availability and fault tolerance.
+
+J. ZooKeeper (Legacy)
+- Used for managing and coordinating Kafka brokers (in older versions).
+- Manages metadata, leader election, and configuration.
+- Being replaced by Kafka's internal KRaft mode (Kafka Raft Metadata mode).
+
+K. Kafka Streams
+- A Java library for building stream processing applications.
+- Allows transformation, filtering, aggregation on real-time data streams.
+
+L. Kafka Connect
+- A tool for connecting Kafka with external systems (e.g., databases, storage, search systems).
+- Comes with built-in connectors for common integrations.
+
+M. Retention Policy
+- Kafka can retain messages for a configured duration or until a certain size is reached.
+- Allows reprocessing of messages and storing long-term logs.
+
+N. Message Delivery Semantics
+- At most once: Messages may be lost but never redelivered.
+- At least once: Messages are never lost but may be redelivered.
+- Exactly once: Guarantees no message loss and no duplication (requires careful configuration).
+
+4. How Kafka Works (Basic Flow):
+--------------------------------
+1. A producer sends a message to a Kafka topic.
+2. Kafka stores the message in the topic's partition.
+3. A consumer in a consumer group reads the message from the partition.
+4. Kafka tracks the consumer's offset to resume reading later.
+
+5. Example Use in MERN Stack:
+-----------------------------
+- React (frontend) sends user actions to backend.
+- Express (Node.js backend) produces events to Kafka (e.g., user registered, order placed).
+- Other backend services consume these events for analytics, notifications, etc.
+- MongoDB stores the final processed results.
+
+6. Useful CLI Commands (if using Kafka locally):
+------------------------------------------------
+- Create a topic:
+  kafka-topics.sh --create --topic my-topic --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+
+- List topics:
+  kafka-topics.sh --list --bootstrap-server localhost:9092
+
+- Produce messages:
+  kafka-console-producer.sh --topic my-topic --bootstrap-server localhost:9092
+
+- Consume messages:
+  kafka-console-consumer.sh --topic my-topic --from-beginning --bootstrap-server localhost:9092
+
+7. Best Practices:
+------------------
+- Use meaningful topic names.
+- Partition your data wisely for scalability.
+- Use replication to prevent data loss.
+- Monitor consumer lag.
+- Use schema registry (e.g., Confluent) for structured data.
+- Handle errors and retries in producers and consumers.
+

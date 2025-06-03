@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\web dev\\xenoAssgn\\backend\\logs\\.f4aebd1e925a37cba0f2755ead0a0e6b9e8078a4-audit.json",
+    "files": [
+        {
+            "date": 1748897054700,
+            "name": "D:\\web dev\\xenoAssgn\\backend\\logs\\combined-2025-06-03.log",
+            "hash": "f0802c4671dae9dfa0bf23901aea9b84fa323b76042901ca71c337573947ac72"
+        }
+    ],
+    "hashType": "sha256"
+}
