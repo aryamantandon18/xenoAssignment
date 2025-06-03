@@ -16,7 +16,7 @@ import NotFound from './pages/404';
 import Layout from './components/ui/Layout';
 import CustomToaster from './components/ui/CustomToaster';
 import SegmentCreate from './pages/segments/SegmentCreate';
-import SegmentDetail from './pages/segments/segmentDetail';
+import SegmentDetail from './pages/segments/SegmentDetail';
 import CampaignCreate from './pages/campaigns/CampaignCreate'
 import CampaignDetail from './pages/campaigns/CampaignDetail';
 
